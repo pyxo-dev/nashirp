@@ -6,6 +6,7 @@
   "author": "Ejez <ejez@protonmail.ch>",
   "private": true,
   "scripts": {
+    "format": "prettier -w src*",
     "lint": "eslint --ext .js,.ts,.vue ./",
     "test": "echo \"No test specified\" && exit 0"
   },
@@ -22,7 +23,8 @@
     "@typescript-eslint/parser": "^4.16.1",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^8.1.0",
-    "eslint-plugin-vue": "^7.0.0"
+    "eslint-plugin-vue": "^7.0.0",
+    "prettier": "2.3.0"
   },
   "browserslist": [
     "last 10 Chrome versions",
