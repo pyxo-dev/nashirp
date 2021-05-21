@@ -1,34 +1,77 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+  <q-layout view="hHh lpR fFf" class="bg-grey-1">
+    <q-header elevated class="bg-white text-grey-8 q-py-xs" height-hint="58">
       <q-toolbar>
         <q-btn
           flat
           dense
           round
-          icon="menu"
           aria-label="Menu"
-          @click="toggleLeftDrawer"
+          icon="menu"
+          @click="togglePrimaryDrawer"
         />
 
-        <q-toolbar-title> Quasar App </q-toolbar-title>
+        <q-btn :to="'/'" flat no-caps no-wrap class="q-ml-xs">
+          <q-icon :name="laLanguageSolid" color="green" size="28px" />
+          <q-toolbar-title shrink class="text-weight-bold">
+            {{ t('Qint') }}
+          </q-toolbar-title>
+        </q-btn>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <q-space />
+
+        <div class="q-gutter-sm row items-center no-wrap">
+          <q-btn round dense flat color="grey-8" :to="pt('blog')">
+            <q-icon :name="laReadme" color="grey-8" size="28px" />
+            <q-tooltip>{{ t('blog').c() }}</q-tooltip>
+          </q-btn>
+
+          <q-btn
+            round
+            dense
+            flat
+            color="grey-8"
+            type="a"
+            href="https://github.com/pyxo-dev/qint"
+            target="_blank"
+          >
+            <q-icon :name="laCodeSolid" color="grey-8" size="28px" />
+            <q-tooltip>{{ t('source code').c() }}</q-tooltip>
+          </q-btn>
+
+          <q-space />
+          <q-space />
+        </div>
+
+        <qint-lang-tag-selector />
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered class="bg-grey-1">
-      <q-list>
-        <q-item-label header class="text-grey-8">
-          Essential Links
-        </q-item-label>
-
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
+    <q-drawer
+      v-model="primaryDrawerOpen"
+      show-if-above
+      bordered
+      class="bg-grey-2"
+      :width="240"
+    >
+      <q-scroll-area class="fit">
+        <q-list padding>
+          <q-item
+            v-for="link in links1"
+            :key="link.text"
+            :to="pt(link.to)"
+            v-ripple
+            clickable
+          >
+            <q-item-section avatar>
+              <q-icon color="grey" :name="link.icon" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ t(link.text).c() }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-scroll-area>
     </q-drawer>
 
     <q-page-container>
@@ -38,71 +81,47 @@
 </template>
 
 <script lang="ts">
-import EssentialLink from 'components/EssentialLink.vue'
-
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev',
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework',
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev',
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev',
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev',
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev',
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev',
-  },
-]
-
+import {
+  laCodeSolid,
+  laLanguageSolid,
+  laReadme,
+} from '@quasar/extras/line-awesome'
 import { defineComponent, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import QintLangTagSelector from '../components/QintLangTagSelector.vue'
+import { pt } from '../i18n/helpers'
 
 export default defineComponent({
   name: 'MainLayout',
 
   components: {
-    EssentialLink,
+    QintLangTagSelector,
   },
 
   setup() {
-    const leftDrawerOpen = ref(false)
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const { t } = useI18n()
+
+    const primaryDrawerOpen = ref(false)
+    function togglePrimaryDrawer() {
+      primaryDrawerOpen.value = !primaryDrawerOpen.value
+    }
 
     return {
-      essentialLinks: linksList,
-      leftDrawerOpen,
-      toggleLeftDrawer() {
-        leftDrawerOpen.value = !leftDrawerOpen.value
-      },
+      t,
+      pt,
+
+      laLanguageSolid,
+      laReadme,
+      laCodeSolid,
+
+      primaryDrawerOpen,
+      togglePrimaryDrawer,
+
+      links1: [
+        { icon: 'home', text: 'home', to: '' },
+        { icon: laReadme, text: 'blog', to: 'blog' },
+      ],
     }
   },
 })

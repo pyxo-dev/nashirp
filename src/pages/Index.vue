@@ -1,49 +1,64 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
+  <q-page v-if="postLc" class="q-px-lg">
+    <h4 v-html="postLc.title"></h4>
+    <div class="text-body1" v-html="postLc.body"></div>
   </q-page>
 </template>
 
 <script lang="ts">
-import { Todo, Meta } from 'components/models'
-import ExampleComponent from 'components/CompositionComponent.vue'
-import { defineComponent, ref } from 'vue'
+import { qint } from 'src/boot/int'
+import type { Ref } from 'vue'
+import { defineComponent, onBeforeUnmount, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+interface IndexPostLc {
+  title: string
+  body: string
+}
+// Current index post localization.
+const postLc: Ref<IndexPostLc | undefined> = ref()
 
 export default defineComponent({
-  name: 'PageIndex',
-  components: { ExampleComponent },
+  name: 'IndexPostLc',
+
   setup() {
-    const todos = ref<Todo[]>([
-      {
-        id: 1,
-        content: 'ct1',
-      },
-      {
-        id: 2,
-        content: 'ct2',
-      },
-      {
-        id: 3,
-        content: 'ct3',
-      },
-      {
-        id: 4,
-        content: 'ct4',
-      },
-      {
-        id: 5,
-        content: 'ct5',
-      },
-    ])
-    const meta = ref<Meta>({
-      totalCount: 1200,
+    const i18n = useI18n()
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const { locale: langTag } = i18n
+    const { langTags } = qint.conf
+
+    const paths: Record<string, string> = {}
+    langTags.forEach((lt) => (paths[lt] = '/'))
+
+    // Set the hreflang link tags.
+    const link = qint.hreflangPaths({ paths, xDefaultLangTag: langTags[0] })
+    if (link) qint.meta.value = { link }
+
+    onBeforeUnmount(() => {
+      // Reset the hreflang link tags.
+      qint.meta.value = {}
     })
-    return { todos, meta }
+
+    // When the language tag changes, update the post localization.
+    watch(
+      langTag,
+      async (langTag) => {
+        await updatePostLc(langTag)
+      },
+      { immediate: true }
+    )
+
+    return { postLc }
   },
 })
+
+async function updatePostLc(langTag: string) {
+  try {
+    postLc.value = (<{ default: IndexPostLc }>(
+      await import(`src/content/${langTag}/index.ts`)
+    )).default
+  } catch (err) {
+    console.error(err)
+  }
+}
 </script>

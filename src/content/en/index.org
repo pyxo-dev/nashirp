@@ -1,0 +1,17 @@
+* Introduction
+Qint is a JavaScript package that facilitates building localized websites and
+applications. It provides a library of functions and tools that you can use to:
+
+Manage Quasar language packs (lazy loading, custom packs...).
+
+Manage vue-i18n.
+
+Add hreflang link tags for better SEO.
+
+and many more features.
+
+* Installation
+Qint can be installed as an npm/yarn package =@pyxo/qint=, or through the Quasar app
+[[https://github.com/pyxo-dev/quasar-app-extension-int][extension]].
+
+The extension provides a scaffold, that serves as an example implementation.
